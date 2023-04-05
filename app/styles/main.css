@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: rgba(255, 123, 0, 0.05) !important;
+}
+
+a {
+  @apply text-gray-700 no-underline;
+}
+
+header {
+  background-color: #373a40;
+}
+
+/* override RainbowKit styles */
+header button {
+  color: black !important;
+  background-color: white !important;
+}
+
+/* NavLink */
+.active {
+  @apply font-bold;
+}
+
+.posts-list {
+  @apply mt-0 list-none space-y-5 pl-0;
+}
+
+/* /d/ */
+.post-body p {
+  margin-top: 0;
+}
+
+.post + .post {
+  border-top: 1px solid rgb(234, 234, 234);
+  padding-top: 2rem;
+}
+
+.post-item a {
+  flex-grow: 1;
+}
+
+.post-item:hover .control-menu > button {
+  @apply opacity-100 transition duration-300;
+}
+
+.control-menu > button[aria-expanded='false'] {
+  @apply opacity-0;
+}
+
+.avatar-border {
+  @apply rounded-full;
+  padding: 1rem;
+  border: 0.125rem dashed #ced4da;
+}
