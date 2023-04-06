@@ -1,25 +1,6 @@
-import type { ActionArgs, LoaderArgs } from '@remix-run/node'; // or cloudflare/deno
-import { json, redirect } from '@remix-run/node'; // or cloudflare/deno
-import { useLoaderData } from '@remix-run/react';
+import { json, type ActionArgs } from '@remix-run/node';
 
-import { getSession, commitSession } from '~/session.server';
-import { authenticator } from '~/auth.server';
-
-export async function loader({ request }: LoaderArgs) {
-  const session = await getSession(request.headers.get('Cookie'));
-
-  const data = { error: session.get('error') };
-
-  // return await authenticator.isAuthenticated(request, {
-  //   successRedirect: '/dashboard',
-  // });
-
-  return json(data, {
-    headers: {
-      'Set-Cookie': await commitSession(session),
-    },
-  });
-}
+import { getSession, commitSession } from '~/sessions';
 
 export async function action({ request }: ActionArgs) {
   const body = await request.json();
@@ -30,9 +11,12 @@ export async function action({ request }: ActionArgs) {
 
   session.set('user', body);
 
-  return redirect('/', {
-    headers: {
-      'Set-Cookie': await commitSession(session),
-    },
-  });
+  return json(
+    {},
+    {
+      headers: {
+        'Set-Cookie': await commitSession(session),
+      },
+    }
+  );
 }

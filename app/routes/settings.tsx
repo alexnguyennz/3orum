@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useLoaderData, useRevalidator } from '@remix-run/react';
-import { json, redirect, type LoaderArgs } from '@remix-run/node';
-import { getSession } from '~/session.server';
-
-import { useAccount } from 'wagmi';
+import { json, type LoaderArgs } from '@remix-run/node';
+import { getSession } from '~/sessions';
 
 import { polybase } from '~/root';
 
@@ -23,20 +21,17 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
-type Profile = {
-  id: string;
-  username: string;
-  avatar: string;
-  created_at: string;
-};
-
 export async function loader({ request }: LoaderArgs) {
   const session = await getSession(request.headers.get('Cookie'));
 
   const userSession = session.get('user');
-  console.log('/settings userSession', userSession);
 
-  if (!userSession) return redirect('/');
+  const message = userSession
+    ? null
+    : 'You do not have permission to access this page. Try again after logging in.';
+
+  if (!userSession)
+    return json({ message, user: null, posts: [], discussions: [] });
 
   const { data: user } = await polybase
     .collection('User')
@@ -52,11 +47,13 @@ export async function loader({ request }: LoaderArgs) {
   // query workaround - filter out all posts for only discussions
   const discussions = posts.filter((post) => !post.data.discussion);
 
-  return json({ user, posts, discussions });
+  return json({ message, user, posts, discussions });
 }
 
 export default function Settings() {
-  const { user, posts, discussions } = useLoaderData<typeof loader>();
+  const { message, user, posts, discussions } = useLoaderData<typeof loader>();
+
+  const revalidator = useRevalidator();
 
   const [username, setUsername] = useState(user?.username);
   const [loading, setLoading] = useState(false);
@@ -77,7 +74,12 @@ export default function Settings() {
     revalidator.revalidate();
   }
 
-  const revalidator = useRevalidator();
+  if (message)
+    return (
+      <div className="flex mt-20 justify-center">
+        <p>{message}</p>
+      </div>
+    );
 
   return (
     <>

@@ -129,11 +129,11 @@ export default function Connect() {
                     <Menu.Divider />
                     <Menu.Item
                       onClick={async () => {
-                        await disconnect();
-                        await fetch('logout');
+                        disconnect();
                       }}
                       component={Link}
-                      //to={`/logout`}
+                      reloadDocument
+                      to={`/logout`}
                       icon={<IconLogout className="h-5 w-5" />}
                       color="red"
                     >

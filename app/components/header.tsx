@@ -11,7 +11,7 @@ export default function Header() {
   const { address, isConnected } = useAccount();
 
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && address) {
       queryUser(address);
     }
   }, [address, isConnected]);
