@@ -19,8 +19,8 @@ export default function DiscussionEditor({
   address,
   tagsData,
 }: {
-  address: string | null | undefined;
-  tagsData: Tag[];
+  address: string;
+  tagsData: { data: Tag }[];
 }) {
   // const [content, setContent] = useState<string | null>(null);
   const [postTitle, setPostTitle] = useState<string>('');
@@ -47,7 +47,7 @@ export default function DiscussionEditor({
     const postContent = editor!.getHTML();
 
     const id = await createDiscussion(
-      address.toLowerCase()!,
+      address.toLowerCase(),
       postTitle,
       postContent,
       tagValue!

@@ -14,6 +14,8 @@ import { IconMessages } from '@tabler/icons-react';
 import DiscussionEditor from '~/components/discussion-editor';
 import TagIcon from '~/components/tag-icon';
 
+import { type Tag } from '~/types';
+
 export async function loader(args: LoaderArgs) {
   const { data: tags } = await polybase.collection('Tag').get();
 
@@ -22,7 +24,8 @@ export async function loader(args: LoaderArgs) {
 
 // layout for index and /t/*
 export default function HomeLayout() {
-  const { tags } = useLoaderData<typeof loader>();
+  //const { tags } = useLoaderData<typeof loader>();
+  const { tags } = useLoaderData();
 
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -41,7 +44,7 @@ export default function HomeLayout() {
         size="auto"
         transitionProps={{ transition: 'slide-up' }}
       >
-        <DiscussionEditor address={address} tagsData={tags} />
+        <DiscussionEditor address={address!} tagsData={tags} />
       </Modal>
 
       <div className="flex flex-col gap-10 md:flex-row">
@@ -64,7 +67,7 @@ export default function HomeLayout() {
               </NavLink>
             </li>
 
-            {tags.map(({ data: tag }) => (
+            {tags.map(({ data: tag }: { data: Tag }) => (
               <li key={tag.id}>
                 <NavLink to={`/t/${tag.id}`}>
                   <Group>

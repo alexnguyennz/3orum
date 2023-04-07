@@ -12,6 +12,7 @@ export interface Post {
   message: string;
   tag: Tag;
   discussion?: Post;
+  replies?: { account: string; timestamp: string }[];
 }
 
 export interface Posts {

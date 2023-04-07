@@ -4,8 +4,6 @@ import { Link, useRevalidator } from '@remix-run/react';
 
 import { useAccount } from 'wagmi';
 
-import { useCollection } from '@polybase/react';
-import { type CollectionRecordResponse } from '@polybase/client';
 import { polybase } from '~/root';
 
 import { Group, Menu, UnstyledButton, Stack, Text } from '@mantine/core';
@@ -24,8 +22,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
 export default function PostItem({ post }: { post: Post }) {
-  const [replies, setReplies] = useState<CollectionRecordResponse<any>[]>([]);
-
   const revalidator = useRevalidator();
 
   const { address } = useAccount();
@@ -35,20 +31,6 @@ export default function PostItem({ post }: { post: Post }) {
   useEffect(() => {
     setShowControls(address?.toLowerCase() === post.account);
   }, [address]);
-
-  // get discussion's posts or replies
-  const { data } = useCollection(
-    polybase
-      .collection('Post')
-      .where('discussion', '==', polybase.collection('Post').record(post.id!))
-      .sort('timestamp', 'desc') // sort by newest to get the latest reply timestamp
-  );
-
-  useEffect(() => {
-    if (data) {
-      setReplies(data.data);
-    }
-  }, [data]);
 
   async function deletePost() {
     const collection = polybase.collection('Post');
@@ -73,31 +55,30 @@ export default function PostItem({ post }: { post: Post }) {
               </Text>
             </Stack>
             <Text size="sm" color="gray.6">
-              {replies.length > 0 ? (
-                <Group align="center" spacing={3}>
-                  <IconArrowBackUp className="h-4 w-4" />
-
+              <span>
+                {post.replies ? (
+                  <Group align="center" spacing={3}>
+                    <IconArrowBackUp className="h-4 w-4" />
+                    <span>
+                      {truncateAddress(post.replies[0].account)} replied{' '}
+                      {dayjs(post.replies[0].timestamp).fromNow()}
+                    </span>
+                  </Group>
+                ) : (
                   <span>
-                    {truncateAddress(replies[0].data.account)} replied{' '}
-                    {dayjs(replies[0].data.timestamp).fromNow()}
+                    {truncateAddress(post.account)} started{' '}
+                    {dayjs(post.timestamp).fromNow()}
                   </span>
-                </Group>
-              ) : (
-                <span>
-                  {truncateAddress(post.account)} started{' '}
-                  {dayjs(post.timestamp).fromNow()}
-                </span>
-              )}
+                )}
+              </span>
             </Text>
           </Link>
         </Stack>
         <Group spacing="sm" align="center">
-          {data?.data && (
-            <Group spacing={4} align="center" className="text-sm">
-              <IconMessageCircle2 className="h-4 w-4" />
-              <Text>{data?.data.length}</Text>
-            </Group>
-          )}
+          <Group spacing={4} align="center" className="text-sm">
+            <IconMessageCircle2 className="h-4 w-4" />
+            <Text>{post.replies ? post.replies.length : 0}</Text>
+          </Group>
 
           {showControls && (
             <div className="control-menu mt-1">
