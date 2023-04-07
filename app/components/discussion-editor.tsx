@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from '@remix-run/react';
+import { useEffect, useState } from "react";
+import { useNavigate } from "@remix-run/react";
 
 // Mantine
-import { Button, Select, Stack, TextInput } from '@mantine/core';
-import { RichTextEditor, Link } from '@mantine/tiptap';
-import { useEditor } from '@tiptap/react';
-import Highlight from '@tiptap/extension-highlight';
-import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-import TextAlign from '@tiptap/extension-text-align';
-import { IconTags } from '@tabler/icons-react';
+import { Button, Select, Stack, TextInput } from "@mantine/core";
+import { RichTextEditor, Link } from "@mantine/tiptap";
+import { useEditor } from "@tiptap/react";
+import Highlight from "@tiptap/extension-highlight";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
+import { IconTags } from "@tabler/icons-react";
 
-import { createDiscussion } from '~/utils/polybase';
+import { createDiscussion } from "~/utils/polybase";
 
-import { type Tag } from '~/types';
+import { type Tag } from "~/types";
 
 export default function DiscussionEditor({
   address,
@@ -23,10 +23,10 @@ export default function DiscussionEditor({
   tagsData: { data: Tag }[];
 }) {
   // const [content, setContent] = useState<string | null>(null);
-  const [postTitle, setPostTitle] = useState<string>('');
+  const [postTitle, setPostTitle] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [tags, setTags] = useState<{ value: string; label: string }[]>([]);
-  const [tagValue, setTagValue] = useState<string | null>('');
+  const [tagValue, setTagValue] = useState<string | null>("");
 
   const navigate = useNavigate();
 
@@ -36,9 +36,9 @@ export default function DiscussionEditor({
       Underline,
       Link,
       Highlight,
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
-    content: 'Write your post here...',
+    content: "Write your post here...",
   });
 
   async function create() {
@@ -87,14 +87,14 @@ export default function DiscussionEditor({
             icon={<IconTags />}
           />
           <div>
-            <RichTextEditor editor={editor} classNames={{ content: 'h-40' }}>
+            <RichTextEditor editor={editor} classNames={{ content: "h-40" }}>
               <RichTextEditor.Toolbar sticky stickyOffset={60}>
                 <RichTextEditor.ControlsGroup>
                   <RichTextEditor.Bold />
                   <RichTextEditor.Italic />
                   <RichTextEditor.Underline />
                   <RichTextEditor.Strikethrough />
-                  <RichTextEditor.ClearFormatting />
+
                   <RichTextEditor.Highlight />
                   <RichTextEditor.Code />
                 </RichTextEditor.ControlsGroup>
@@ -108,7 +108,7 @@ export default function DiscussionEditor({
 
                 <RichTextEditor.ControlsGroup>
                   <RichTextEditor.Blockquote />
-                  <RichTextEditor.Hr />
+
                   <RichTextEditor.BulletList />
                   <RichTextEditor.OrderedList />
                 </RichTextEditor.ControlsGroup>

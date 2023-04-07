@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import { Link } from '@remix-run/react';
+import { useEffect } from "react";
+import { Link } from "@remix-run/react";
 
-import { useAccount } from 'wagmi';
-import ConnectButton from '~/components/connect-button';
+import { useAccount } from "wagmi";
+import ConnectButton from "~/components/connect-button";
 
-import { polybase } from '~/root';
-import { callCreateUser } from '~/utils/polybase';
+import { polybase } from "~/root";
+import { callCreateUser } from "~/utils/polybase";
 
 export default function Header() {
   const { address, isConnected } = useAccount();
@@ -17,15 +17,15 @@ export default function Header() {
   }, [address, isConnected]);
 
   /**
-   * check if logged in user has a record, if not then create it
+   * check if logged-in user has a record, if not then create it
    */
   async function queryUser(address: string) {
     try {
-      const { data } = await polybase.collection('User').record(address).get();
+      const { data } = await polybase.collection("User").record(address).get();
 
       // set cookie
-      await fetch('login', {
-        method: 'POST',
+      await fetch("/login", {
+        method: "POST",
         body: JSON.stringify(data),
       });
     } catch (err) {

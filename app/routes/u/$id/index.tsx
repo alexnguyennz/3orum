@@ -16,7 +16,10 @@ import { callUpdatePost, callDeletePost } from "~/utils/polybase";
 import type { Post as PostType } from "~/types";
 
 export default function UserPosts() {
-  const { posts, users }: any = useRouteLoaderData("routes/u"); // https://github.com/remix-run/remix/pull/5157
+  /**
+   * Issue: https://github.com/remix-run/remix/pull/5157
+   */
+  const { posts, users }: any = useRouteLoaderData("routes/u");
 
   const revalidator = useRevalidator();
 
@@ -51,10 +54,11 @@ export default function UserPosts() {
         opened={postDrawer[0]}
         onClose={postDrawer[1].close}
         title={<></>}
-        overlayProps={{ opacity: 0.05, blur: 0 }}
+        classNames={{ inner: "top-auto" }} /* place modal at bottom of screen */
+        yOffset={0}
+        overlayProps={{ opacity: 0, blur: 0 }}
         size="auto"
         transitionProps={{ transition: "slide-up" }}
-        centered
       >
         <Stack className="mx-auto max-w-lg">
           <TextEditor />
@@ -72,7 +76,6 @@ export default function UserPosts() {
         posts.map(({ data: post }: { data: PostType }) => (
           <Post
             post={post}
-            showLink={true}
             open={postDrawer[1].open}
             setSelectedPost={setSelectedPost}
             deletePost={deletePost}

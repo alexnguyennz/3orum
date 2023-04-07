@@ -1,38 +1,44 @@
-import { useEffect, useState, useContext } from 'react';
-import { Link } from '@remix-run/react';
+import {
+  useEffect,
+  useState,
+  useContext,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
+import { Link, useLocation } from "@remix-run/react";
 
-import { useAccount } from 'wagmi';
+import { useAccount } from "wagmi";
 
-import { EditorContext } from '~/provider/EditorProvider';
+import { EditorContext } from "~/provider/EditorProvider";
 
-import { ActionIcon, Avatar, Menu, Text } from '@mantine/core';
-import { IconDots, IconPencil, IconTrash } from '@tabler/icons-react';
+import { ActionIcon, Avatar, Menu, Text } from "@mantine/core";
+import { IconDots, IconPencil, IconTrash } from "@tabler/icons-react";
 
-import type { Post as PostType, Users } from '~/types';
+import type { Post as PostType, Users } from "~/types";
 
 // Utilities
-import parse from 'html-react-parser';
-import truncateAddress from '~/utils/truncateAddress';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import parse from "html-react-parser";
+import truncateAddress from "~/utils/truncateAddress";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 
 export default function Post({
   post,
-  showLink,
   open,
   setSelectedPost,
   deletePost,
   users,
 }: {
   post: PostType;
-  showLink?: boolean;
   open: () => void;
-  setSelectedPost?: any;
-  deletePost?: any;
+  setSelectedPost: Dispatch<SetStateAction<string>>;
+  deletePost: (id: string) => Promise<void>;
   users?: Users[];
 }) {
+  const { pathname } = useLocation();
+
   const { address } = useAccount();
 
   const { setTitle, setContent } = useContext(EditorContext);
@@ -47,10 +53,6 @@ export default function Post({
       return find!.data.avatar;
     }
   }
-
-  useEffect(() => {
-    getAvatar();
-  }, []);
 
   useEffect(() => {
     setShowControls(address?.toLowerCase() === post.account);
@@ -78,7 +80,12 @@ export default function Post({
               {dayjs(post.timestamp).fromNow()}
             </span>
           </div>
-          {showLink ? (
+
+          {pathname.startsWith("/d/") ? (
+            <div className="post-body rounded-xl bg-white p-5 shadow">
+              {parse(post.message)}
+            </div>
+          ) : (
             <div>
               <Link to={`/d/${post.discussion?.id || post.id}`}>
                 <div className="post-body rounded-xl bg-white p-5 shadow">
@@ -86,15 +93,11 @@ export default function Post({
                 </div>
               </Link>
             </div>
-          ) : (
-            <div className="post-body rounded-xl bg-white p-5 shadow">
-              {parse(post.message)}
-            </div>
           )}
         </div>
       </div>
 
-      {showControls && (
+      {showControls ? (
         <div className="control-menu controls flex justify-end transition">
           <Menu shadow="md" width={200} withArrow>
             <Menu.Target>
@@ -125,8 +128,17 @@ export default function Post({
             </Menu.Dropdown>
           </Menu>
         </div>
+      ) : (
+        <div className="invisible">
+          <Menu>
+            <Menu.Target>
+              <ActionIcon>
+                <IconDots className="h-5 w-5" />
+              </ActionIcon>
+            </Menu.Target>
+          </Menu>
+        </div>
       )}
-      {/* )} */}
     </div>
   );
 }

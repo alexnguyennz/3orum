@@ -1,28 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   NavLink,
   Outlet,
   useLoaderData,
   useRevalidator,
-} from '@remix-run/react';
-import { json, type LoaderArgs } from '@remix-run/node';
+} from "@remix-run/react";
+import { json, type LoaderArgs } from "@remix-run/node";
 
-import { useAccount } from 'wagmi';
-import { polybase } from '~/root';
+import { useAccount } from "wagmi";
+import { polybase } from "~/root";
 
 /* UI */
-import { Avatar, Group, Stack } from '@mantine/core';
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
+import { Avatar, Group, Stack } from "@mantine/core";
+import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import {
   IconMessageCircle2,
   IconMenu2,
   IconSettings,
-} from '@tabler/icons-react';
+} from "@tabler/icons-react";
 
 /* Utilities */
-import { callSetAvatar } from '~/utils/polybase';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import { callSetAvatar } from "~/utils/polybase";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 
@@ -31,19 +31,33 @@ export async function loader({ params }: LoaderArgs) {
 
   const userId = id!.toLowerCase(); // for any checksummed addresses
 
-  const { data: user } = await polybase.collection('User').record(userId).get();
+  const { data: user } = await polybase.collection("User").record(userId).get();
 
   const { data: posts } = await polybase
-    .collection('Post')
-    .where('account', '==', userId)
-    .sort('timestamp', 'desc')
+    .collection("Post")
+    .where("account", "==", userId)
+    .sort("timestamp", "desc")
     .get();
 
   // query workaround - filter out all posts for only discussions
-  const discussions = posts.filter((post) => !post.data.discussion);
+  const discussions = posts
+    .filter((post) => !post.data.discussion)
+    .map(({ data }) => data);
+
+  // group replies into each discussion object
+  for (let { data } of posts) {
+    if (data.discussion) {
+      const index = discussions.findIndex((el) => {
+        return el.id === data.discussion.id;
+      });
+
+      discussions[index].replies = discussions[index].replies ?? [];
+      discussions[index].replies.push(data);
+    }
+  }
 
   // workaround - get all users to display avatar beside each post
-  const { data: users } = await polybase.collection('User').get();
+  const { data: users } = await polybase.collection("User").get();
 
   return json({
     id,
@@ -61,7 +75,7 @@ export default function UserLayout() {
   const [showControls, setShowControls] = useState(false);
 
   useEffect(() => {
-    setShowControls(address?.toLowerCase() === id.toLowerCase());
+    setShowControls(address?.toLowerCase() === id!.toLowerCase());
   }, [address]);
 
   const revalidator = useRevalidator();
@@ -80,7 +94,7 @@ export default function UserLayout() {
               >
                 <Dropzone.Idle>
                   <Avatar
-                    src={user.avatar ? user.avatar : '/avatar.png'}
+                    src={user.avatar ? user.avatar : "/avatar.png"}
                     className="rounded-full"
                     alt="User's avatar"
                     size="xl"
@@ -90,7 +104,7 @@ export default function UserLayout() {
             ) : (
               <div className="avatar-border">
                 <Avatar
-                  src={user.avatar ? user.avatar : '/avatar.png'}
+                  src={user.avatar ? user.avatar : "/avatar.png"}
                   className="rounded-full"
                   alt="User's avatar"
                   size="xl"

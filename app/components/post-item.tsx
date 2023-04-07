@@ -1,24 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-import { Link, useRevalidator } from '@remix-run/react';
+import { Link, useRevalidator } from "@remix-run/react";
 
-import { useAccount } from 'wagmi';
+import { useAccount } from "wagmi";
 
-import { polybase } from '~/root';
+import { polybase } from "~/root";
 
-import { Group, Menu, UnstyledButton, Stack, Text } from '@mantine/core';
+import { Group, Menu, UnstyledButton, Stack, Text } from "@mantine/core";
 import {
   IconArrowBackUp,
   IconDotsVertical,
   IconMessageCircle2,
   IconTrash,
-} from '@tabler/icons-react';
+} from "@tabler/icons-react";
 
-import type { Post } from '~/types';
+import type { Post } from "~/types";
 
-import truncateAddress from '~/utils/truncateAddress';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import truncateAddress from "~/utils/truncateAddress";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
 dayjs.extend(relativeTime);
 
 export default function PostItem({ post }: { post: Post }) {
@@ -33,10 +34,10 @@ export default function PostItem({ post }: { post: Post }) {
   }, [address]);
 
   async function deletePost() {
-    const collection = polybase.collection('Post');
+    const collection = polybase.collection("Post");
     await collection
       .record(post.id)
-      .call('del')
+      .call("del")
       .catch((err) => {
         console.log(err);
       });
@@ -60,13 +61,13 @@ export default function PostItem({ post }: { post: Post }) {
                   <Group align="center" spacing={3}>
                     <IconArrowBackUp className="h-4 w-4" />
                     <span>
-                      {truncateAddress(post.replies[0].account)} replied{' '}
+                      {truncateAddress(post.replies[0].account)} replied{" "}
                       {dayjs(post.replies[0].timestamp).fromNow()}
                     </span>
                   </Group>
                 ) : (
                   <span>
-                    {truncateAddress(post.account)} started{' '}
+                    {truncateAddress(post.account)} started{" "}
                     {dayjs(post.timestamp).fromNow()}
                   </span>
                 )}
@@ -74,14 +75,14 @@ export default function PostItem({ post }: { post: Post }) {
             </Text>
           </Link>
         </Stack>
-        <Group spacing="sm" align="center">
+        <Group spacing={3} align="center">
           <Group spacing={4} align="center" className="text-sm">
             <IconMessageCircle2 className="h-4 w-4" />
             <Text>{post.replies ? post.replies.length : 0}</Text>
           </Group>
 
-          {showControls && (
-            <div className="control-menu mt-1">
+          {showControls ? (
+            <div className="control-menu mt-2">
               <Menu shadow="md" width={200} withArrow>
                 <Menu.Target>
                   <UnstyledButton>
@@ -97,6 +98,16 @@ export default function PostItem({ post }: { post: Post }) {
                     Delete
                   </Menu.Item>
                 </Menu.Dropdown>
+              </Menu>
+            </div>
+          ) : (
+            <div className="invisible">
+              <Menu width={200}>
+                <Menu.Target>
+                  <UnstyledButton>
+                    <IconDotsVertical className="h-5 w-5" />
+                  </UnstyledButton>
+                </Menu.Target>
               </Menu>
             </div>
           )}

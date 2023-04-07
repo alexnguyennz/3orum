@@ -1,50 +1,49 @@
-import { useEffect, useState, useContext } from 'react';
-import { Link, useLoaderData, useRevalidator } from '@remix-run/react';
-import { json, redirect, type LoaderArgs } from '@remix-run/node';
+import { useState, useContext } from "react";
+import { Link, useLoaderData, useRevalidator } from "@remix-run/react";
+import { json, redirect, type LoaderArgs } from "@remix-run/node";
 
-import { useConnectModal } from '@rainbow-me/rainbowkit';
-import { useAccount } from 'wagmi';
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
 
-import { useAuth } from '@polybase/react';
-import { type CollectionRecordResponse } from '@polybase/client';
-import { polybase } from '~/root';
+import { type CollectionRecordResponse } from "@polybase/client";
+import { polybase } from "~/root";
 
-import { Button, Menu, Modal, Stack, Text } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { IconCaretDown, IconTrash } from '@tabler/icons-react';
+import { Button, Menu, Modal, Stack, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { IconCaretDown, IconTrash } from "@tabler/icons-react";
 
-import { EditorContext } from '~/provider/EditorProvider';
-import Post from '~/components/post';
-import TextEditor from '~/components/text-editor';
-import TagIcon from '~/components/tag-icon';
+import { EditorContext } from "~/provider/EditorProvider";
+import Post from "~/components/post";
+import TextEditor from "~/components/text-editor";
+import TagIcon from "~/components/tag-icon";
 
 import {
   callAddPostToDiscussion,
   callUpdatePost,
   callDeletePost,
-} from '~/utils/polybase';
+} from "~/utils/polybase";
 
 export async function loader({ params }: LoaderArgs) {
   const { id } = params;
 
   try {
     const { data: discussion } = await polybase
-      .collection('Post')
+      .collection("Post")
       .record(id!)
       .get();
 
     const { data: posts } = await polybase
-      .collection('Post')
-      .where('discussion', '==', polybase.collection('Post').record(id!))
-      .sort('timestamp', 'asc')
+      .collection("Post")
+      .where("discussion", "==", polybase.collection("Post").record(id!))
+      .sort("timestamp", "asc")
       .get();
 
     // workaround - get all users to display avatar beside each post
-    const { data: users } = await polybase.collection('User').get();
+    const { data: users } = await polybase.collection("User").get();
 
     return json({ id, discussion, posts, users });
   } catch {
-    return redirect('/');
+    return redirect("/");
   }
 }
 
@@ -59,7 +58,7 @@ export default function SinglePost() {
   const postDrawer = useDisclosure(false);
   const addPostDrawer = useDisclosure(false);
 
-  const [selectedPost, setSelectedPost] = useState<string>('');
+  const [selectedPost, setSelectedPost] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function updatePost(replyId: string) {
@@ -85,7 +84,7 @@ export default function SinglePost() {
 
     await callAddPostToDiscussion(
       id!,
-      address.toLowerCase(),
+      address!.toLowerCase(),
       content,
       discussion.title,
       discussion.tag
@@ -106,11 +105,11 @@ export default function SinglePost() {
         opened={postDrawer[0]}
         onClose={postDrawer[1].close}
         title={<></>}
-        classNames={{ inner: 'top-auto' }} /* place modal at bottom of screen */
+        classNames={{ inner: "top-auto" }} /* place modal at bottom of screen */
         yOffset={0}
         overlayProps={{ opacity: 0, blur: 0 }}
         size="auto"
-        transitionProps={{ transition: 'slide-up' }}
+        transitionProps={{ transition: "slide-up" }}
       >
         <Stack className="mx-auto max-w-lg">
           <TextEditor />
@@ -129,11 +128,11 @@ export default function SinglePost() {
         opened={addPostDrawer[0]}
         onClose={addPostDrawer[1].close}
         title={<></>}
-        classNames={{ inner: 'top-auto' }} /* place modal at bottom of screen */
+        classNames={{ inner: "top-auto" }} /* place modal at bottom of screen */
         yOffset={0}
         overlayProps={{ opacity: 0, blur: 0 }}
         size="auto"
-        transitionProps={{ transition: 'slide-up' }}
+        transitionProps={{ transition: "slide-up" }}
       >
         <Stack className="mx-auto max-w-lg">
           <TextEditor />
@@ -195,7 +194,7 @@ export default function SinglePost() {
               onClick={
                 isConnected
                   ? () => {
-                      setContent('');
+                      setContent("");
                       addPostDrawer[1].open();
                     }
                   : openConnectModal
