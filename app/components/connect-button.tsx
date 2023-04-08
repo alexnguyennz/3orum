@@ -1,15 +1,15 @@
-import { Link } from '@remix-run/react';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useDisconnect } from 'wagmi';
+import { Link } from "@remix-run/react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useDisconnect } from "wagmi";
 
-import { Menu, Button } from '@mantine/core';
+import { Menu, Button } from "@mantine/core";
 import {
   IconChevronDown,
   IconLogout,
   IconSettings,
   IconUser,
   IconWallet,
-} from '@tabler/icons-react';
+} from "@tabler/icons-react";
 
 export default function Connect() {
   const { disconnect } = useDisconnect();
@@ -19,20 +19,18 @@ export default function Connect() {
       {({
         account,
         chain,
-        openAccountModal,
-        openChainModal,
         openConnectModal,
         authenticationStatus,
         mounted,
       }) => {
         // Note: If your app doesn't use authentication, you
         // can remove all 'authenticationStatus' checks
-        const ready = mounted && authenticationStatus !== 'loading';
+        const ready = mounted && authenticationStatus !== "loading";
         const connected =
           ready &&
           account &&
           chain &&
-          (!authenticationStatus || authenticationStatus === 'authenticated');
+          (!authenticationStatus || authenticationStatus === "authenticated");
 
         if (!mounted) {
           return (
@@ -41,7 +39,6 @@ export default function Connect() {
               color="dark"
               radius="md"
               loading={true}
-              size="md"
               styles={{
                 leftIcon: {
                   margin: 0,
@@ -55,11 +52,11 @@ export default function Connect() {
         return (
           <div
             {...(!ready && {
-              'aria-hidden': true,
+              "aria-hidden": true,
               style: {
                 opacity: 0,
-                pointerEvents: 'none',
-                userSelect: 'none',
+                pointerEvents: "none",
+                userSelect: "none",
               },
             })}
           >
@@ -69,7 +66,6 @@ export default function Connect() {
                   <Button
                     onClick={openConnectModal}
                     rightIcon={<IconWallet />}
-                    size="md"
                     variant="white"
                     color="dark"
                     radius="md"
@@ -93,7 +89,6 @@ export default function Connect() {
                   <Menu.Target>
                     <Button
                       rightIcon={<IconChevronDown />}
-                      size="md"
                       variant="white"
                       color="dark"
                       radius="md"

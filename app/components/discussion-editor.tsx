@@ -9,7 +9,7 @@ import Highlight from "@tiptap/extension-highlight";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
-import { IconTags } from "@tabler/icons-react";
+// import { IconTags } from "@tabler/icons-react";
 
 import { createDiscussion } from "~/utils/polybase";
 
@@ -84,7 +84,7 @@ export default function DiscussionEditor({
             onChange={setTagValue}
             label="Tag"
             placeholder="Choose a tag for your discussion"
-            icon={<IconTags />}
+            //icon={<IconTags />}
           />
           <div>
             <RichTextEditor editor={editor} classNames={{ content: "h-40" }}>
