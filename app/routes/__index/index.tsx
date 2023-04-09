@@ -32,16 +32,24 @@ export async function loader({ request }: LoaderArgs) {
         return el.id === data.discussion.id;
       });
 
-      discussions[index].replies = discussions[index].replies ?? [];
-      discussions[index].replies.push(data);
+      if (index !== -1) {
+        discussions[index].replies = discussions[index].replies ?? [];
+        discussions[index].replies.push(data);
+      }
     }
   }
 
+  // Search - filter discussions and replies
   if (q) {
     discussions = discussions.filter((post) => {
-      return (
-        post.title.toLowerCase().includes(q.toLowerCase()) ||
-        post.message.toLowerCase().includes(q.toLowerCase())
+      const content = post.replies.map(
+        ({ message }: { message: string }) => message
+      );
+
+      content.push(post.title, post.message);
+
+      return content.some((str: string) =>
+        str.toLowerCase().includes(q.toLowerCase())
       );
     });
   }
