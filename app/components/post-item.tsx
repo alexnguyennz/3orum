@@ -31,7 +31,7 @@ export default function PostItem({ post }: { post: Post }) {
 
   useEffect(() => {
     setShowControls(address?.toLowerCase() === post.account);
-  }, [address]);
+  }, [address, post.account]);
 
   async function deletePost() {
     const collection = polybase.collection("Post");
@@ -91,6 +91,13 @@ export default function PostItem({ post }: { post: Post }) {
                 </Menu.Target>
 
                 <Menu.Dropdown>
+                  {/* <Menu.Item
+                    // onClick={deletePost}
+                    icon={<IconEdit className="h-5 w-5" />}
+                  >
+                    Rename
+                  </Menu.Item>
+                  <Menu.Divider />*/}
                   <Menu.Item
                     onClick={deletePost}
                     icon={<IconTrash className="h-5 w-5" />}

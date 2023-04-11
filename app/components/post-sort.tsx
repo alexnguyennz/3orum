@@ -16,10 +16,10 @@ export default function PostSort() {
     setValue(e);
 
     // re-navigate to refresh loader and update data
-    if (e === "oldest") {
-      navigate(`?sort=${e}`);
+    if (e === "newest") {
+      navigate(pathname);
     } else {
-      navigate(pathname); // navigate to current route
+      navigate(`?sort=${e}`);
     }
   }
 
@@ -32,6 +32,7 @@ export default function PostSort() {
       data={[
         { value: "newest", label: "Newest" },
         { value: "oldest", label: "Oldest" },
+        { value: "top", label: "Top" },
       ]}
       rightSection={<IconChevronDown size="1rem" />}
       rightSectionWidth={30}

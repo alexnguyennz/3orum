@@ -7,20 +7,20 @@ import PostsList from "~/components/posts-list";
 
 export async function loader({ request }: LoaderArgs) {
   const url = new URL(request.url);
-  const sort = url.searchParams.get("sort");
+  const sort = url.searchParams.get("sort") || "newest";
   const q = url.searchParams.get("q");
 
-  let filter: "desc" | "asc" = "desc";
-  if (sort === "oldest") {
-    filter = "asc";
-  }
+  const timestampFilter: { [key: string]: "asc" | "desc" } = {
+    newest: "desc",
+    oldest: "asc",
+  };
 
   const { data: posts } = await polybase
     .collection("Post")
-    .sort("timestamp", filter)
+    .sort("timestamp", timestampFilter[sort])
     .get();
 
-  // query workaround - filter out all posts for only discussions
+  // Polybase workaround - filter out all posts for only discussions
   let discussions = posts
     .filter(({ data }) => !data.discussion)
     .map(({ data }) => data);
@@ -37,6 +37,10 @@ export async function loader({ request }: LoaderArgs) {
         discussions[index].replies.push(data);
       }
     }
+  }
+
+  if (sort === "top") {
+    discussions.sort((a, b) => b.replies.length - a.replies.length);
   }
 
   // Search - filter discussions and replies
