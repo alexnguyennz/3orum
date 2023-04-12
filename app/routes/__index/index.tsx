@@ -5,6 +5,11 @@ import { polybase } from "~/root";
 
 import PostsList from "~/components/posts-list";
 
+import { getDiscussionsFromPosts, sortDiscussions } from "~/utils/post-sort";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+
 export async function loader({ request }: LoaderArgs) {
   const url = new URL(request.url);
   const sort = url.searchParams.get("sort") || "newest";
@@ -20,28 +25,9 @@ export async function loader({ request }: LoaderArgs) {
     .sort("timestamp", timestampFilter[sort])
     .get();
 
-  // Polybase workaround - filter out all posts for only discussions
-  let discussions = posts
-    .filter(({ data }) => !data.discussion)
-    .map(({ data }) => data);
+  let discussions = getDiscussionsFromPosts(posts);
 
-  // group replies into each discussion object
-  for (let { data } of posts) {
-    if (data.discussion) {
-      const index = discussions.findIndex((el) => {
-        return el.id === data.discussion.id;
-      });
-
-      if (index !== -1) {
-        discussions[index].replies = discussions[index].replies ?? [];
-        discussions[index].replies.push(data);
-      }
-    }
-  }
-
-  if (sort === "top") {
-    discussions.sort((a, b) => b.replies.length - a.replies.length);
-  }
+  discussions = sortDiscussions(discussions, sort);
 
   // Search - filter discussions and replies
   if (q) {
@@ -58,11 +44,11 @@ export async function loader({ request }: LoaderArgs) {
     });
   }
 
-  return json({ discussions });
+  return json({ discussions, sort });
 }
 
 export default function Index() {
-  const { discussions } = useLoaderData<typeof loader>();
+  const { discussions, sort } = useLoaderData<typeof loader>();
 
-  return <PostsList posts={discussions} />;
+  return <PostsList posts={discussions} sort={sort} />;
 }

@@ -19,7 +19,6 @@ import type { Post } from "~/types";
 import truncateAddress from "~/utils/truncateAddress";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-
 dayjs.extend(relativeTime);
 
 export default function PostItem({ post }: { post: Post }) {
@@ -61,8 +60,13 @@ export default function PostItem({ post }: { post: Post }) {
                   <Group align="center" spacing={3}>
                     <IconArrowBackUp className="h-4 w-4" />
                     <span>
-                      {truncateAddress(post.replies[0].account)} replied{" "}
-                      {dayjs(post.replies[0].timestamp).fromNow()}
+                      {truncateAddress(
+                        post.replies[post.replies.length - 1].account
+                      )}{" "}
+                      replied{" "}
+                      {dayjs(
+                        post.replies[post.replies.length - 1].timestamp
+                      ).fromNow()}
                     </span>
                   </Group>
                 ) : (

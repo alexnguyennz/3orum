@@ -5,6 +5,8 @@ import { polybase } from "~/root";
 
 import PostsList from "~/components/posts-list";
 
+import { getDiscussionsFromPosts, sortDiscussions } from "~/utils/post-sort";
+
 export async function loader({ params, request }: LoaderArgs) {
   const url = new URL(request.url);
   const sort = url.searchParams.get("sort") || "newest";
@@ -20,34 +22,15 @@ export async function loader({ params, request }: LoaderArgs) {
     .sort("timestamp", timestampFilter[sort])
     .get();
 
-  // Polybase workaround - filter out all posts for only discussions
-  const discussions = posts
-    .filter((post) => !post.data.discussion)
-    .map(({ data }) => data);
+  let discussions = getDiscussionsFromPosts(posts);
 
-  // group replies into each discussion object
-  for (let { data } of posts) {
-    if (data.discussion) {
-      const index = discussions.findIndex((el) => {
-        return el.id === data.discussion.id;
-      });
+  discussions = sortDiscussions(discussions, sort);
 
-      if (index !== -1) {
-        discussions[index].replies = discussions[index].replies ?? [];
-        discussions[index].replies.push(data);
-      }
-    }
-  }
-
-  if (sort === "top") {
-    discussions.sort((a, b) => b.replies.length - a.replies.length);
-  }
-
-  return json({ discussions });
+  return json({ discussions, sort });
 }
 
 export default function Tag() {
-  const { discussions } = useLoaderData<typeof loader>();
+  const { discussions, sort } = useLoaderData<typeof loader>();
 
-  return <PostsList posts={discussions} />;
+  return <PostsList posts={discussions} sort={sort} />;
 }

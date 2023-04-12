@@ -5,8 +5,8 @@ import { useNavigate, useLocation } from "@remix-run/react";
 import { Select } from "@mantine/core";
 import { IconChevronDown } from "@tabler/icons-react";
 
-export default function PostSort() {
-  const [value, setValue] = useState("newest");
+export default function PostSort({ sort }: { sort: string }) {
+  const [value, setValue] = useState(sort);
 
   const navigate = useNavigate();
 
@@ -33,6 +33,7 @@ export default function PostSort() {
         { value: "newest", label: "Newest" },
         { value: "oldest", label: "Oldest" },
         { value: "top", label: "Top" },
+        { value: "recent", label: "Recent" },
       ]}
       rightSection={<IconChevronDown size="1rem" />}
       rightSectionWidth={30}
