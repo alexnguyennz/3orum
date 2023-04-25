@@ -47,7 +47,7 @@ export default function DiscussionEditor({
     const postContent = editor!.getHTML();
 
     const id = await createDiscussion(
-      address.toLowerCase(),
+      address,
       postTitle,
       postContent,
       tagValue!

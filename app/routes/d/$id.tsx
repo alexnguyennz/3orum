@@ -84,7 +84,7 @@ export default function SinglePost() {
 
     await callAddPostToDiscussion(
       id!,
-      address!.toLowerCase(),
+      address!,
       content,
       discussion.title,
       discussion.tag

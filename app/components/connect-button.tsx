@@ -102,7 +102,7 @@ export default function Connect() {
                         },
                       }}
                     >
-                      {account.displayName.toLowerCase()}
+                      {account.displayName}
                     </Button>
                   </Menu.Target>
 

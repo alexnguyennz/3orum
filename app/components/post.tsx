@@ -11,12 +11,18 @@ import { useAccount } from "wagmi";
 
 import { EditorContext } from "~/provider/EditorProvider";
 
-import { ActionIcon, Avatar, Menu, Text } from "@mantine/core";
-import { IconDots, IconPencil, IconTrash } from "@tabler/icons-react";
+import { ActionIcon, Avatar, Menu, Text, UnstyledButton } from "@mantine/core";
+import {
+  IconDots,
+  IconPencil,
+  IconThumbUp,
+  IconTrash,
+} from "@tabler/icons-react";
 
 import type { Post as PostType, Users } from "~/types";
 
 // Utilities
+import { callLikePost } from "~/utils/polybase";
 import parse from "html-react-parser";
 import truncateAddress from "~/utils/truncateAddress";
 import dayjs from "dayjs";
@@ -50,12 +56,12 @@ export default function Post({
         (element: Users) => element.data.id === post.account
       );
 
-      return find!.data.avatar;
+      if (find) return find!.data.avatar;
     }
   }
 
   useEffect(() => {
-    setShowControls(address?.toLowerCase() === post.account);
+    setShowControls(address === post.account);
   }, [address]);
 
   return (
@@ -98,7 +104,10 @@ export default function Post({
       </div>
 
       {showControls ? (
-        <div className="control-menu controls flex justify-end transition">
+        <div className="control-menu controls flex items-center justify-end gap-3 transition">
+          <UnstyledButton onClick={() => callLikePost(post.id, address!)}>
+            <IconThumbUp />
+          </UnstyledButton>
           <Menu shadow="md" width={200} withArrow>
             <Menu.Target>
               <ActionIcon color="dark" variant="transparent">

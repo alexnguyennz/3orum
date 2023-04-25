@@ -1,47 +1,47 @@
-import { useEffect, useState } from 'react';
-import { NavLink, useLoaderData, useRevalidator } from '@remix-run/react';
-import { json, type LoaderArgs } from '@remix-run/node';
-import { getSession } from '~/sessions';
+import { useState } from "react";
+import { NavLink, useLoaderData, useRevalidator } from "@remix-run/react";
+import { json, type LoaderArgs } from "@remix-run/node";
+import { getSession } from "~/sessions";
 
-import { polybase } from '~/root';
+import { polybase } from "~/root";
 
 /* UI */
-import { Avatar, Button, Group, Stack, TextInput } from '@mantine/core';
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
+import { Avatar, Button, Group, Stack, TextInput } from "@mantine/core";
+import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import {
   IconMessageCircle2,
   IconMenu2,
   IconSettings,
-} from '@tabler/icons-react';
+} from "@tabler/icons-react";
 
 /* Utilities */
-import { callSetAvatar } from '~/utils/polybase';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import { callSetAvatar } from "~/utils/polybase";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 
 export async function loader({ request }: LoaderArgs) {
-  const session = await getSession(request.headers.get('Cookie'));
+  const session = await getSession(request.headers.get("Cookie"));
 
-  const userSession = session.get('user');
+  const userSession = session.get("user");
 
   const message = userSession
     ? null
-    : 'You do not have permission to access this page. Try again after logging in.';
+    : "You do not have permission to access this page. Try again after logging in.";
 
   if (!userSession)
     return json({ message, user: null, posts: [], discussions: [] });
 
   const { data: user } = await polybase
-    .collection('User')
-    .record(userSession.id.toLowerCase())
+    .collection("User")
+    .record(userSession.id)
     .get();
 
   const { data: posts } = await polybase
-    .collection('Post')
-    .where('account', '==', userSession.id.toLowerCase())
-    .sort('timestamp', 'desc')
+    .collection("Post")
+    .where("account", "==", userSession.id)
+    .sort("timestamp", "desc")
     .get();
 
   // query workaround - filter out all posts for only discussions
@@ -62,9 +62,9 @@ export default function Settings() {
     setLoading(true);
 
     await polybase
-      .collection('User')
-      .record(user.id.toLowerCase())
-      .call('setUsername', [username])
+      .collection("User")
+      .record(user.id)
+      .call("setUsername", [username])
       .catch((err) => {
         console.log(err);
         setLoading(false);
@@ -76,7 +76,7 @@ export default function Settings() {
 
   if (message)
     return (
-      <div className="flex mt-20 justify-center">
+      <div className="mt-20 flex justify-center">
         <p>{message}</p>
       </div>
     );
@@ -88,7 +88,7 @@ export default function Settings() {
           <div className="flex w-40 max-w-6xl items-center gap-10 py-10">
             <Dropzone
               onDrop={async (files) => {
-                callSetAvatar(user.id.toLowerCase(), files[0], revalidator);
+                callSetAvatar(user.id, files[0], revalidator);
               }}
               maxSize={3 * 1024 ** 2}
               accept={IMAGE_MIME_TYPE}
@@ -118,10 +118,10 @@ export default function Settings() {
         <div className="flex flex-col gap-10 md:flex-row">
           <ul className="mt-0 list-none space-y-3 pl-0 text-sm">
             <li>
-              <NavLink to={`/u/${user.id.toLowerCase()}`} end>
+              <NavLink to={`/u/${user.id}`} end>
                 <Group>
                   <IconMessageCircle2 className="h-5 w-5" />
-                  Posts{' '}
+                  Posts{" "}
                   <span className="ml-1 text-xs">
                     {!!posts.length && posts.length}
                   </span>
@@ -129,7 +129,7 @@ export default function Settings() {
               </NavLink>
             </li>
             <li>
-              <NavLink to={`/u/${user.id.toLowerCase()}/discussions`} end>
+              <NavLink to={`/u/${user.id}/discussions`} end>
                 <Group>
                   <IconMenu2 className="h-5 w-5" />
                   Discussions
@@ -159,7 +159,7 @@ export default function Settings() {
                 placeholder="Username"
                 label="Username"
                 description="Your profile name"
-                inputWrapperOrder={['label', 'error', 'input', 'description']}
+                inputWrapperOrder={["label", "error", "input", "description"]}
               />
 
               <Button onClick={updateUsername} loading={loading} color="dark.4">

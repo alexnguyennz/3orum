@@ -29,7 +29,7 @@ export default function PostItem({ post }: { post: Post }) {
   const [showControls, setShowControls] = useState(false);
 
   useEffect(() => {
-    setShowControls(address?.toLowerCase() === post.account);
+    setShowControls(address === post.account);
   }, [address, post.account]);
 
   async function deletePost() {

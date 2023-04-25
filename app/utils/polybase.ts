@@ -56,6 +56,16 @@ export async function callCreateUser(address: string) {
   await polybase.collection("User").create([address, dayjs().toISOString()]);
 }
 
+export async function callLikePost(postId: string, userId: string) {
+  await polybase
+    .collection("Like")
+    .create([
+      nanoid(),
+      polybase.collection("Post").record(postId),
+      polybase.collection("User").record(userId),
+    ]);
+}
+
 export async function callSetAvatar(
   id: string,
   file: File,

@@ -20,6 +20,7 @@ import {
 } from "@tabler/icons-react";
 
 /* Utilities */
+import { getDiscussionsFromPosts } from "~/utils/post-sort";
 import { callSetAvatar } from "~/utils/polybase";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -29,32 +30,20 @@ dayjs.extend(relativeTime);
 export async function loader({ params }: LoaderArgs) {
   const { id } = params;
 
-  const userId = id!.toLowerCase(); // for any checksummed addresses
+  const userId = id; // for any checksummed addresses
 
-  const { data: user } = await polybase.collection("User").record(userId).get();
+  const { data: user } = await polybase
+    .collection("User")
+    .record(userId!)
+    .get();
 
   const { data: posts } = await polybase
     .collection("Post")
-    .where("account", "==", userId)
+    .where("account", "==", userId!)
     .sort("timestamp", "desc")
     .get();
 
-  // query workaround - filter out all posts for only discussions
-  const discussions = posts
-    .filter((post) => !post.data.discussion)
-    .map(({ data }) => data);
-
-  // group replies into each discussion object
-  for (let { data } of posts) {
-    if (data.discussion) {
-      const index = discussions.findIndex((el) => {
-        return el.id === data.discussion.id;
-      });
-
-      discussions[index].replies = discussions[index].replies ?? [];
-      discussions[index].replies.push(data);
-    }
-  }
+  let discussions = getDiscussionsFromPosts(posts);
 
   // workaround - get all users to display avatar beside each post
   const { data: users } = await polybase.collection("User").get();
@@ -75,7 +64,7 @@ export default function UserLayout() {
   const [showControls, setShowControls] = useState(false);
 
   useEffect(() => {
-    setShowControls(address?.toLowerCase() === id!.toLowerCase());
+    setShowControls(address === id!);
   }, [address]);
 
   const revalidator = useRevalidator();

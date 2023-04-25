@@ -5,6 +5,7 @@ import { polybase } from "~/root";
 
 import PostsList from "~/components/posts-list";
 
+/* Utilities */
 import { getDiscussionsFromPosts, sortDiscussions } from "~/utils/post-sort";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
